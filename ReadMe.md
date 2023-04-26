@@ -1,151 +1,215 @@
-# Collections
-
+ OOP Concepts
+​
 ## Topics covered
-
-Lists, dictionaries and other collection types. Working with dates and texts.
-
+​
+Classes, objects, properties and methods, encapsulation and inheritance.
+​
 ## Goal achieved
-
+​
 By the end of the exercise you will have upgraded your query command line tool to use a more complex data set and perform additional operations.
-
-More specifically, you will add the following features:
-
-- Add a total counter when listing all items.
-- Change the search to case insensitive.
-- The search will list all items matching, instead of indicating the number. For each item, it will also show the number of days it has been in stock.
-- Add a new menu option to browse the items by category.
-
+​
+​
 ## Data
-
-Replace the file `sample/data.py` in your repository with the file [sample/data.py](sample/data.py).
-
-This new file has a little more data and uses a list of dictionaries to describe the data. Each dictionary has the following keys:
-
-- **state** *string*: The condition of the item (example: Brand new, old, cheap,...)
-- **category** *string*: The type of item (example: Laptop, Tablet, Headphones,...)
-- **warehouse** *integer*: The warehouse number where this item is located.
-- **date_of_stock** *date*: The date and time the item was stocked.
-
-The full name of the item will be a composition of `state` and `category`.
-
+​
+This time, the data that you will use to write your query tool will be a list of objects instead of a list of dictionaries.
+​
+The exercise includes a small module to transform the original dictionaries in the `data.py` file into objects that are stored in memory.
+​
+Besides the type conversion, the data will also be structured slightly different. The `stock` will be a list of warehouses instead of items. Each warehouse will be an object with a property `stock` that is a list of item objects.
+​
+Copy the file [sample/loader.py](sample/loader.py) into `cli/loader.py` in your project.
+​
 ## Description
-
-### Refactoring
-
-After replacing the data, you will have to edit the `cli/query.py` file and the first thing you will have to do is changing the first line from:
-
-`from data import warehouse1, warehouse2`
-
-To:
-
-`from data import stock`
-
-After this, the first task will be to adapt the query tool to work with the new data structure.
-
-> Notice that the full name of each item is now a composition of the keys `state` and `category`. To replicate the current behavior, the script must compare the user input with the combination of `state` and `category`.
-
-Once all the current features are working as expected with the new data, add all those changes to the remote repository (add them locally, commit them with a meaningful text and push them).
-
-After that, add the following features/changes.
-
-> **IMPORTANT**
->
-> Do not forget to push all the changes to the remote repository again at the end of the exercise. Commit the changes with a meaningful description.
-
-### Changes on menu option 1 (list all items)
-
-When printing the list of items, and at the end of the whole list, print the total amount of items in stock on each warehouse:
-
-##### Sample output:
-
+​
+As usual, you will start with the traditional refactoring, this time into classes and the new stock data structure. This process can be a little more complex than the one you did with functions. It involves various steps:
+​
+1. Analyze and decide which classes are required.
+1. Implement the classes in Python.
+1. Transform the original dictionary-based data set into the new class-based data set.
+1. Refactor the original `query.py` file to accommodate the new class-based data structure.
+​
+An experienced developer will require some time to do all of this, and you may chose to do so as well, but the exercise provides you with a solution for the first and third steps that will help you concentrate on the most important parts of the topics covered.
+​
+### 1. Classes
+​
+You will define classes for the two main data domains of the tool: stock and personnel.
+​
+You should certainly consider a class `Item`, but you can also consider a class `Warehouse`. This class can be useful, as it will allow to add methods such as `add_item`, `remove_item` or `search` and properties such as `stock`, `capacity` or `location`. Not all will be implemented now, but this will give you more flexibility in the future.
+​
+For the users, you should also consider a class `Employee`, but since the tool can also be used by guests, you may need to define a more general `User` class. They have quite a few differences, but **an employee is a type of user**.
+​
+You can use any approach you like, but if you are uncertain on how to do it you may want to read the following guidelines:
+​
+#### Stock
+​
+##### Warehouse
+​
+| Property   | Type | Default |
+|------------|------|---------|
+| id         | int  | None    |
+| stock      | list | []      |
+​
+Both properties need to be properties of the object, not just the class. Otherwise, the stock would be shared among all warehouses and the desired solution this time is to have each Warehouse manage its own stock (after all, an item cannot be in two warehouses at the same time).
+​
+| Method     | Input                    | Output |
+|------------|--------------------------|--------|
+| \_\_init__ | **warehouse_id**: int    | None   |
+| occupancy  | None                     | int    |
+| add_item   | **item**: \<Item>        | None   |
+| search     | **search_term**: str     | list   |
+​
+The constructor method will have an input argument that will be the id of the warehouse as an integer, and it will store this value in the object's `id` property. It does not require a `stock` argument because the stock will be managed with the `add_item` method. Instead, it must simply initialize the `stock` attribute as an empty list.
+​
+The `occupancy` method will not take any argument and will return an integer representing the number of items in stock.
+​
+The `add_item` method will take an instance of `Item` as an argument. This method should simply add the given object to the `stock` property.
+​
+The `search` method will search the items in the current warehouse and will return the list of matching items according to the `search_term` passed.
+​
+Once this class is done, you should write the `Item` class, which is being used by the `Warehouse` class you just wrote.
+​
+##### Item
+​
+| Property      | Type         | Default |
+|---------------|--------------|---------|
+| state         | str          | None    |
+| category      | str          | None    |
+| date_of_stock | datetime     | None    |
+​
+Each one of these properties will be supplied to the constructor method below at the moment of instantiating the objects.
+​
+In the original data, each item has an attribute `warehouse` as well. This attribute will be received as an argument of the constructor method below, but you will not store it as a property of the object.
+​
+The items will be stored in the `stock` property of each `Warehouse` object, so the item does not need this information for now.
+​
+| Method     | Input                                                                                    | Output |
+|------------|------------------------------------------------------------------------------------------|--------|
+| \_\_init__ | **state**: str, **category**: str, **warehouse**: int, **date_of_stock**: datetime | None   |
+| \_\_str__  | None                                                                                     | str    |
+​
+The constructor method will receive all those arguments, and should store them all as object properties, except the warehouse.
+​
+The `__str__` method is used to return a string representation of the object. This method is called automatically when we use the object as a string (ex: `print(item)` or `print(f"Item: {item}")`).
+​
+This method must return the concatenation of the properties `state` and `category`.
+​
+#### Personnel
+​
+##### User
+​
+| Property         | Type | Default     |
+|------------------|------|-------------|
+| _name            | str  | "Anonymous" |
+| is_authenticated | bool | False       |
+​
+The `_name` property will be a protected property (thus, the underscore). If the user provides an empty string as their name, their name should be "Anonymous".
+​
+The `is_authenticated` property will be set to `False` and it will not change for the standard users, but it will still be defined as a property to make the main code simpler (here, you will check `is_authenticated` without having to check first if it is an employee or a guest).
+​
+| Method       | Input              | Output |
+|--------------|--------------------|--------|
+| \_\_init__   | **user_name**: str | None   |
+| authenticate | **password**: str  | False  |
+| is_named     | **name**: str      | bool   |
+| greet        | None               | None   |
+| bye          | **actions**: list  | None   |
+​
+The constructor method takes an argument named `user_name` and it will store this value in the `_name` object property.
+​
+The `authenticate` method will always return `False`. Like `is_authenticated`, this method is just a placeholder for the feature and to allow us to have a simpler code in `query.py`. The `Employee` class will override this method.
+​
+The `is_named` method will return `True` if the name passed to the method equals the `self._name` property. Since `_name` is protected we will need a way to check if the user is the one we want.
+​
+The `greet` method will print a welcoming message to the user. The message for this user object will be:
+​
 ```
-...
-- High quality Tablet
-
-Total items in warehouse 1: ???
-Total items in warehouse 2: ???
-
-Thank you for your visit, Wolfgang!
+Hello, {name of the user}!
+Welcome to our Warehouse Database.
+If you don't find what you are looking for,
+please ask one of our staff members to assist you.
 ```
-
-### Changes on menu option 2 (search and place order)
-
-Change the search of the items (operation number `2`) so that:
-
-1. It produces the same result when typing `cheap tablet` and `CHEAP TABLET` (the search should be **case insensitive**).
-1. If the search returns at least one result (in any warehouse), it prints a list of all the items showing the name of the warehouse and the number of days it has passed since they were stocked.
-2. It still prints the maximum availability only when the item is found in more than one warehouse.
-3. It still prints `Location: Not in stock` when the item is not found.
-
-##### Sample outputs:
-
+​
+The `bye` method will print a *thank you* message. To minimize speculations on how the system handles the log data, it has been decided that the guest user will not be shown the summary of its actions.
+​
+##### Employee
+​
+The `Employee` class will extend the `User` class, so it will have its same properties and methods, plus the following ones:
+​
+| Property   | Type              | Default |
+|------------|-------------------|---------|
+| __password | str               | None    |
+| head_of    | list(\<Employee>) | []      |
+​
+The `__password` property is private and should not be used anywhere other that this class' methods.
+​
+The `head_of` property stores a list of `Employee` objects, by default it is an empty list.
+​
+| Method       | Input                                                               | Output |
+|--------------|---------------------------------------------------------------------|--------|
+| \_\_init__   | **user_name**: str, **password**: str, **head_of**: list (optional) | None   |
+| authenticate | **password**: str                                                   | bool   |
+| order        | **item**: \<Item>, **amount**: int                                  | None   |
+| greet        | None                                                                | None   |
+| bye          | **actions**: list                                                   | None   |
+​
+The constructor method will need to be overwritten. This time, you should make sure that the object is instantiated with both a `user_name` and `password` arguments. These arguments are compulsory.
+​
+The argument `head_of` is a list of dictionaries and is optional. If there is such argument, the constructor should save it in the `head_of` property as a list of `Employee` objects and not a dictionary.
+​
+The `authenticate` method will also be overwritten, because in this case we need to check if the password is valid. The method will return `True` if the argument `password` matches the property `__password` of the object.
+​
+The `order` method will print the name of the item and amount ordered by the user when they place an order.
+​
+The `greet` method will also print a message, but the message to employees will be different:
+​
 ```
-...
-What is the name of the item? funny headphones
-Amount available: 5
-Location:
-- Warehouse 1 (in stock for 905 days)
-- Warehouse 1 (in stock for 33 days)
-- Warehouse 1 (in stock for 193 days)
-- Warehouse 2 (in stock for 957 days)
-- Warehouse 2 (in stock for 188 days)
-Maximum availability: 3 in Warehouse 1
-
-Would you like to order this item?(y/n) n
-...
+Hello, {name of the user}!
+If you experience a problem with the system,
+please contact technical support.
 ```
+​
+The `bye` method will also print a *thank you* message but, additionally, it will print the summary of actions taken during the session. This method should call the parent method to print the message defined there and then print the list of actions. It should not redefine the `Thank you for your visit, {name}!` message.
+​
+### 2. Implementing the classes
+​
+Create a file named `classes.py` to define your classes. If you are following these guidelines and you want to use the [Loader class supplied](sample/loader.py), name the classes and methods as indicated on section [1. Classes](#1-classes).
+​
+From now on, we recommend you to split the task in two. It may be easier to finish the job if you concentrate first on implementing and refactoring all the classes and features related to the stock, for instance, rather than implementing everything, then changing all the data and then refactoring the main script.
+​
+You should start implementing the classes related to the stock: `Warehouse` and `Item`. Before you try them on your query tool, you may want to use the Python console to do explicit tests of your classes with hard-coded data. For instance:
+​
 ```
-...
-What is the name of the item? bigger headphones
-Amount available: 0
-Location: Not in stock
-...
+(env) $ python3
+>>> from classes import Warehouse
+>>> one = Warehouse(1)
+>>> two = Warehouse(2)
+>>> one.add_item("anything goes")
+>>> print(one.occupancy())
+1
+>>> print(two.occupancy())
+0
 ```
-
-### New menu option (browse by category)
-
-Add a new menu option named `Browse by category`. Assign it the number 3 and move down the `Quit` option to number 4. When selected, this option should:
-
-1. Show a menu of available categories. This menu will have to include a numeric code (the number the user will type in to select a category), the name of the category and the amount of items available in that category (in any warehouse).
-
-    > There is no list of categories in the dataset, so you will have to iterate all the stock to identify the categories and count their items.
-    >
-    > You will also have to find a way to produce a numeric identifier for each category.
-    >
-    > The menu list should show single categories (each category should only appear once).
-
-1. Ask the user to type the category number of their choice.
-1. List all items in that category. This time, print them one after the other (not separated by warehouse) and include the name of the warehouse at the end of each line.
-
-    > Be aware that the code associated to each category will be an auto-generated numeric code and the items have a text value as category. You will have to think of a way to identify each number typed by the user to the correct category name to be able to filter the stock.
-
-##### Sample output:
-
+​
+Once you have done that, try [loading the data](#3-loading-the-data) and then [refactor your main script](#4-refactoring) to use this new data set.
+​
+When the stock related features work as they are expected, then come back here and implement the classes `User` and `Employee` and follow the same steps.
+​
+### 3. Loading the data
+​
+The import instruction you used so far to load the data:
+​
 ```
-What is your user name? Example
-
-Hello, Example!
-What would you like to do?
-1. List items by warehouse
-2. Search an item and place an order
-3. Browse by category
-4. Quit
-Type the number of the operation: 3
-
-1. Keyboard (34)
-2. Smartphone (39)
-3. Mouse (39)
-4. Laptop (40)
-5. Headphones (37)
-6. Monitor (40)
-7. Router (30)
-8. Tablet (41)
-Type the number of the category to browse: 4
-
-List of laptops available:
-Exceptional laptop, Warehouse 2
-...
-Second hand laptop, Warehouse 1
-
-Thank you for your visit, Example!
+from data import personnel, stock
 ```
+​
+Will be equivalent to:
+​
+```
+from loader import Loader
+​
+​
+personnel = Loader(model="personnel")
+stock = Loader(model="stock")
+```
+​
+If you are working on the stock first, leave the initial import as it was and only use the loader for the model `"stock"`. This way, the `personnel` list will still be the original one and it will be easier to focus on the task at hand.
