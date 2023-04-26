@@ -1,133 +1,151 @@
-Functions
-Topics covered
-Functions, arguments & parameters, scope, recursion and decorators.
+# Collections
 
-Goal achieved
-By the end of the exercise you will have a better structured code that will be easier to maintain and further improve. You will also add some more features to your command line query tool.
+## Topics covered
+
+Lists, dictionaries and other collection types. Working with dates and texts.
+
+## Goal achieved
+
+By the end of the exercise you will have upgraded your query command line tool to use a more complex data set and perform additional operations.
 
 More specifically, you will add the following features:
 
-Unlimited warehouses
-Extended sessions
-User system
-Data
-For the new features you will need some new data, so that you can test your code.
+- Add a total counter when listing all items.
+- Change the search to case insensitive.
+- The search will list all items matching, instead of indicating the number. For each item, it will also show the number of days it has been in stock.
+- Add a new menu option to browse the items by category.
 
-Replace your file sample/data.py with the one at sample/data.py.
+## Data
 
-This file now has a list of items from 4 different warehouses.
+Replace the file `sample/data.py` in your repository with the file [sample/data.py](sample/data.py).
 
-It also has a list with the user names and passwords of the employees. This is a nested list of dictionaries and it may change with time. You don't know how many nesting levels may the list hold.
+This new file has a little more data and uses a list of dictionaries to describe the data. Each dictionary has the following keys:
 
-Description
-The script you created so far in this project has become very useful to the warehouse employees, and they are requesting to have additional functionalities developed.
+- **state** *string*: The condition of the item (example: Brand new, old, cheap,...)
+- **category** *string*: The type of item (example: Laptop, Tablet, Headphones,...)
+- **warehouse** *integer*: The warehouse number where this item is located.
+- **date_of_stock** *date*: The date and time the item was stocked.
 
-But the code starts to get big and some of these new features are becoming difficult to implement. Thankfully, you have just learned about functions and are ready to improve the readability and structure of the code to make it easier to add these requested features.
+The full name of the item will be a composition of `state` and `category`.
 
-Refactor the code
-Again, you will be refactoring the code, this time to use functions. The code is not extremely huge, but it is starting to be a bit complex to manage already and converting this into meaningful functions may not always be easy.
+## Description
 
-To do this, look at your file and identify big chunks of code that are used for a particular task. In your case, this is not extremely complex as you have a menu you can use to identify these first big groups of instructions. Additionally, you have to ask the user name, greet them and make them chose an operation. So, you will need, at least, a function for each of the following tasks:
+### Refactoring
 
-Get the user name
-Greet the user
-Get the operation selected
-Print the list of items
-Search and order an item
-Browse by category
-A way to approach this is to make the changes on the same file. Create the first function on the top and replace the appropriate code in your script with this new function (you can often copy/paste big parts of the code and adapt it when needed). Leave the rest as it is. Check if the tool still works the same way as before. Create the second function and replace the related code. Check again. And so on.
+After replacing the data, you will have to edit the `cli/query.py` file and the first thing you will have to do is changing the first line from:
 
-When you finish all the functions in the previous list, explore each one of the functions to see if they are already readable enough or are still too complex.
+`from data import warehouse1, warehouse2`
 
-Refactor again the function that searches and places orders, it is too complex. If you need it, keep the main logic in the "search and order" function but put the rest of the instructions in three other functions:
+To:
 
-Search an item
-Print the search results
-Order an item
-Refactor now the function that prints the search results. If you look at it you will see two blocks of code that look exactly the same except that one uses the warehouse1 list and the other one uses warehouse2. This is a clear pattern for a function.
+`from data import stock`
 
-Once you are done, your main script (the code outside any function) should look similar to this:
+After this, the first task will be to adapt the query tool to work with the new data structure.
 
-# Get the user name
-user_name = get_user_name()
-greet_user()
+> Notice that the full name of each item is now a composition of the keys `state` and `category`. To replicate the current behavior, the script must compare the user input with the combination of `state` and `category`.
 
-# Get the user selection
-operation = get_selected_operation()
+Once all the current features are working as expected with the new data, add all those changes to the remote repository (add them locally, commit them with a meaningful text and push them).
 
-print()
+After that, add the following features/changes.
 
-# Execute the operation
-if operation == "1":
-    list_items_by_warehouse()
+> **IMPORTANT**
+>
+> Do not forget to push all the changes to the remote repository again at the end of the exercise. Commit the changes with a meaningful description.
 
-elif operation == "2":
-    search_and_order_item()
+### Changes on menu option 1 (list all items)
 
-elif operation == "3":
-    browse_by_category()
+When printing the list of items, and at the end of the whole list, print the total amount of items in stock on each warehouse:
 
-elif operation == "4":
-    pass
+##### Sample output:
 
-else:
-    print("*" * 50)
-    print(operation, "is not a valid operation.")
-    print("*" * 50)
+```
+...
+- High quality Tablet
 
-# Finish
-print()
-print(f"Thank you for your visit, {user_name}!")
-You can chose to create additional functions for the error message and finishing the script.
+Total items in warehouse 1: ???
+Total items in warehouse 2: ???
 
-New features
-The warehouse management and employees have requested the following list of features:
+Thank you for your visit, Wolfgang!
+```
 
-Unlimited number of warehouses
+### Changes on menu option 2 (search and place order)
 
-The tool is only working well for warehouses 1 and 2, but we just opened two more and the business is expanding fast, so we may need to add even more warehouses any time soon.
+Change the search of the items (operation number `2`) so that:
 
-The data is already structured in a way that lets us add items from other warehouses. Each item has a property warehouse and the new item will simply have the value 3 (or 4,...).
+1. It produces the same result when typing `cheap tablet` and `CHEAP TABLET` (the search should be **case insensitive**).
+1. If the search returns at least one result (in any warehouse), it prints a list of all the items showing the name of the warehouse and the number of days it has passed since they were stocked.
+2. It still prints the maximum availability only when the item is found in more than one warehouse.
+3. It still prints `Location: Not in stock` when the item is not found.
 
-But the functions are not prepared for this. They wouldn't make the tool crash and items from a third warehouse would still appear in search results, but they would be grouped and counted as being in one of the other 2 warehouses.
+##### Sample outputs:
 
-The tool should be able to work properly with any number of warehouses in the data, so the functions need to be adapted.
+```
+...
+What is the name of the item? funny headphones
+Amount available: 5
+Location:
+- Warehouse 1 (in stock for 905 days)
+- Warehouse 1 (in stock for 33 days)
+- Warehouse 1 (in stock for 193 days)
+- Warehouse 2 (in stock for 957 days)
+- Warehouse 2 (in stock for 188 days)
+Maximum availability: 3 in Warehouse 1
 
-Hint: remove any variable and argument named warehouse1 and warehouse2, then find another way to do the same without writing 1 variable or 1 argument for each warehouse.
+Would you like to order this item?(y/n) n
+...
+```
+```
+...
+What is the name of the item? bigger headphones
+Amount available: 0
+Location: Not in stock
+...
+```
 
-More than one operation in a session
+### New menu option (browse by category)
 
-Every time an employee finishes using the tool, it stops running. Very often they want to perform additional queries, so they have to execute again the tool, type again the name and then do the new operation.
+Add a new menu option named `Browse by category`. Assign it the number 3 and move down the `Quit` option to number 4. When selected, this option should:
 
-They want you to add an option that, every time an operation finishes, lets them go back to the menu and chose another operation without stopping the tool.
+1. Show a menu of available categories. This menu will have to include a numeric code (the number the user will type in to select a category), the name of the category and the amount of items available in that category (in any warehouse).
 
-So, whenever the script finishes running any operation (except quit), the script should ask the user if they want to perform another operation. If they decline, then the script should stop running. If they accept, then the initial menu should show up again and ask to pick a choice (without asking again for the user name).
+    > There is no list of categories in the dataset, so you will have to iterate all the stock to identify the categories and count their items.
+    >
+    > You will also have to find a way to produce a numeric identifier for each category.
+    >
+    > The menu list should show single categories (each category should only appear once).
 
-This should happen indefinitely until the user declines performing a new operation.
+1. Ask the user to type the category number of their choice.
+1. List all items in that category. This time, print them one after the other (not separated by warehouse) and include the name of the warehouse at the end of each line.
 
-Once this is working, there is an additional requirement for this feature. At the end of the session (when the user declines performing another operation), the tool should print a list of the actions taken during that session and they should appear in the order they were performed.
+    > Be aware that the code associated to each category will be an auto-generated numeric code and the items have a text value as category. You will have to think of a way to identify each number typed by the user to the correct category name to be able to filter the stock.
 
-Example:
+##### Sample output:
+
+```
+What is your user name? Example
+
+Hello, Example!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Browse by category
+4. Quit
+Type the number of the operation: 3
+
+1. Keyboard (34)
+2. Smartphone (39)
+3. Mouse (39)
+4. Laptop (40)
+5. Headphones (37)
+6. Monitor (40)
+7. Router (30)
+8. Tablet (41)
+Type the number of the category to browse: 4
+
+List of laptops available:
+Exceptional laptop, Warehouse 2
+...
+Second hand laptop, Warehouse 1
 
 Thank you for your visit, Example!
-In this session you have:
-        1. Listed 5000 items.
-        2. Searched a Cheap tablet.
-        3. Browsed the category Headphones.
-Hint: Each of the main functions for each one of the 3 operations should return a string with the description of the action taken. You may also need to use recursion for this feature.
-
-User system
-
-The tool has become so popular that the warehouse management has decided to let visitors use it also on the front desk. The problem is, visitors should only be allowed to list, search and browse, and they should not be able to order items straight from the tool. The placing of orders should only be allowed to employees in the personnel list of the data.py file.
-
-The tool should still ask the name to everyone. Only when the user wants to place an order, the tool will ask for a valid password and then will try to match the user name and password against the previous list.
-
-Hint: If you have a function that starts the order (after the user answers yes to placing the order) you can apply a decorator that checks for a variable in the global scope indicating whether the user is already validated. The decorator will override the function with a prompt for the password, or will call the function normally if the user is already validated.
-
-If there is no employee with such name and password, it should say so and should allow the user to change the name and type again the password. This should happen indefinitely until the user declines trying again or succeeds authenticating and finishes the order.
-
-This can be done easier within the decorator to keep the code cleaner and make it easier to implement this feature.
-
-Any of the employees, of any level, in the personnel list is allowed to place orders.
-
-The next time the user tries to place an order during the same session, if the user has already authenticated before, it should remember and not ask for the password again.
+```
