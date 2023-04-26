@@ -1,5 +1,5 @@
 from datetime import datetime
-from Warehouse_Project_DCI.data import stock
+from data import stock
 
 
 def add_keys():
@@ -65,6 +65,7 @@ def order_function(order_dict, i_name):
             order_function(order_dict, i_name)                           # calls itself if more than available to ask for less
     else:
         pass
+
 def search_and_order_item():
     # search of the items (operation number `2`) so that:
     # 1. If the search returns at least one result (in any warehouse), it prints a list of all the items
