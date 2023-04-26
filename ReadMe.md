@@ -1,133 +1,195 @@
-Functions
+Introduction
 Topics covered
-Functions, arguments & parameters, scope, recursion and decorators.
+Command line input and output. Using variables, operators, basic math functions and control flow structures.
 
 Goal achieved
-By the end of the exercise you will have a better structured code that will be easier to maintain and further improve. You will also add some more features to your command line query tool.
+By the end of the exercise you will have created a command line tool to consult items in stock and simulate placing orders.
 
-More specifically, you will add the following features:
-
-Unlimited warehouses
-Extended sessions
-User system
 Data
-For the new features you will need some new data, so that you can test your code.
+The source data are two lists, each one containing the names of all items in a warehouse. The current system has two different warehouses (1 and 2) and two different lists are provided.
 
-Replace your file sample/data.py with the one at sample/data.py.
+The sample directory in this repository has some sample data you can use to test your code with. The directory contains these files:
 
-This file now has a list of items from 4 different warehouses.
+data.py: this module contains the data. To make it easier to work, the data is placed in a different file and is loaded from the main script.
+query.py: this module will contain your script. The first lines show a little help message and load the data into the module. You will have the lists available with the names warehouse1 and warehouse2.
+You can copy these two files into your project repository.
 
-It also has a list with the user names and passwords of the employees. This is a nested list of dictionaries and it may change with time. You don't know how many nesting levels may the list hold.
+You will have to use these lists the way you have seen during the lecture with the range function.
 
+for item in warehouse1:
+    # instructions
 Description
-The script you created so far in this project has become very useful to the warehouse employees, and they are requesting to have additional functionalities developed.
+Go to your repository and create a directory named cli (standing for Command Line Interface). Copy the files data.py and query.py from the sample directory to your repository directory.
 
-But the code starts to get big and some of these new features are becoming difficult to implement. Thankfully, you have just learned about functions and are ready to improve the readability and structure of the code to make it easier to add these requested features.
+Edit the file query.py and write a script that produces the following workflow:
 
-Refactor the code
-Again, you will be refactoring the code, this time to use functions. The code is not extremely huge, but it is starting to be a bit complex to manage already and converting this into meaningful functions may not always be easy.
+The user is asked to provide a name.
+The user is greeted by its name.
+A menu is printed out showing 3 options: 1. List items by warehouse, 2. Search an item and place an order and 3. Quit.
+The user is asked to pick a choice using the numeric values associated.
+If the user picked 1, the script should print each of the items in each of the warehouses (first all items from a warehouse and then all items from the other). Then it should stop execution.
+If the user picked 2, the script should:
+Ask the user to input an item name and search the warehouses.
+The script will print:
+The total amount of items in any warehouse that match that name.
+The location of those items: the name of the warehouse (ex: Warehouse 1), if it can only be found in one, Both warehouses if it is in both and Not in stock if it is in none.
+If it can be found in more than one warehouse, it will also print a line saying which warehouse has the highest amount of those items (and how many does it have).
+Ask the user if they want to place an order for this item.
+If the answer is no, it will do nothing else.
+If the answer is yes, it should ask the user how many do they want.
+If the desired amount is equal or lower than the total available, it will proceed and show a message saying the order has been placed. The message should show the item name and amount ordered.
+If the desired amount is higher than the total available, it should show an error message and should ask the user if they want to order the maximum available, instead.
+If they answer yes, it will proceed and show a message saying the order has been placed. The message should show the item name and amount ordered.
+If they answer no, it will do nothing else.
+If the user picked 3, the script should do nothing else.
+If the user types anything different than 1, 2 or 3 it should show an error message indicating the operation entered is not valid.
+Display a final message thanking the user for the visit, using their name typed at the beginning.
+IMPORTANT
 
-To do this, look at your file and identify big chunks of code that are used for a particular task. In your case, this is not extremely complex as you have a menu you can use to identify these first big groups of instructions. Additionally, you have to ask the user name, greet them and make them chose an operation. So, you will need, at least, a function for each of the following tasks:
+Do not forget to push all the changes to the remote repository once you are done. Commit the changes with a meaningful description.
 
-Get the user name
-Greet the user
-Get the operation selected
-Print the list of items
-Search and order an item
-Browse by category
-A way to approach this is to make the changes on the same file. Create the first function on the top and replace the appropriate code in your script with this new function (you can often copy/paste big parts of the code and adapt it when needed). Leave the rest as it is. Check if the tool still works the same way as before. Create the second function and replace the related code. Check again. And so on.
+Not enough?
 
-When you finish all the functions in the previous list, explore each one of the functions to see if they are already readable enough or are still too complex.
+If you want to do more you can pick some of these add-ons.
 
-Refactor again the function that searches and places orders, it is too complex. If you need it, keep the main logic in the "search and order" function but put the rest of the instructions in three other functions:
+Use a while loop to let the user order multiple items during the same session.
+Sample outputs
+You can use these samples to get a better idea of what the script should do. The text does not need to be exactly as it appears here. This is your project and you can adapt it as you wish, but the general flow should be as described.
 
-Search an item
-Print the search results
-Order an item
-Refactor now the function that prints the search results. If you look at it you will see two blocks of code that look exactly the same except that one uses the warehouse1 list and the other one uses warehouse2. This is a clear pattern for a function.
+Listing all items
 
-Once you are done, your main script (the code outside any function) should look similar to this:
+What is your user name? Mathilda
 
-# Get the user name
-user_name = get_user_name()
-greet_user()
+Hello, Mathilda!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 1
 
-# Get the user selection
-operation = get_selected_operation()
+Items in warehouse 1:
+- Brand new laptop
+- Exceptional monitor
+- Cheap tablet
+...
+- Second hand mouse
+Items in warehouse 2:
+- High quality tablet
+- Second hand headphones
+...
+- Almost new router
+- High quality monitor
 
-print()
+Thank you for your visit, Mathilda!
+Search & found in 1 location, no order
 
-# Execute the operation
-if operation == "1":
-    list_items_by_warehouse()
+What is your user name? Martin
 
-elif operation == "2":
-    search_and_order_item()
+Hello, Martin!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 2
 
-elif operation == "3":
-    browse_by_category()
+What is the name of the item? Cheap tablet
+Amount available: 2
+Location: Warehouse 1
 
-elif operation == "4":
-    pass
+Would you like to order this item?(y/n) n
 
-else:
-    print("*" * 50)
-    print(operation, "is not a valid operation.")
-    print("*" * 50)
+Thank you for your visit, Martin!
+Search & found in 2 locations. Order more than available and accepting maximum.
 
-# Finish
-print()
-print(f"Thank you for your visit, {user_name}!")
-You can chose to create additional functions for the error message and finishing the script.
+What is your user name? Mathilda
 
-New features
-The warehouse management and employees have requested the following list of features:
+Hello, Mathilda!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 2
 
-Unlimited number of warehouses
+What is the name of the item? Almost new router
+Amount available: 3
+Location: Both warehouses
+Maximum availability: 2 in Warehouse 2
 
-The tool is only working well for warehouses 1 and 2, but we just opened two more and the business is expanding fast, so we may need to add even more warehouses any time soon.
+Would you like to order this item?(y/n) y
+How many would you like? 4
+**************************************************
+There are not this many available. The maximum amount that can be ordered is 3
+**************************************************
+Would you like to order the maximum available?(y/n) y
+3 Almost new router have been ordered.
 
-The data is already structured in a way that lets us add items from other warehouses. Each item has a property warehouse and the new item will simply have the value 3 (or 4,...).
+Thank you for your visit, Mathilda!
+Order more than available and not accepting maximum.
 
-But the functions are not prepared for this. They wouldn't make the tool crash and items from a third warehouse would still appear in search results, but they would be grouped and counted as being in one of the other 2 warehouses.
+What is your user name? Ruth
 
-The tool should be able to work properly with any number of warehouses in the data, so the functions need to be adapted.
+Hello, Ruth!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 2
 
-Hint: remove any variable and argument named warehouse1 and warehouse2, then find another way to do the same without writing 1 variable or 1 argument for each warehouse.
+What is the name of the item? Second hand headphones
+Amount available: 8
+Location: Both warehouses
+Maximum availability: 4 in Warehouse 1
 
-More than one operation in a session
+Would you like to order this item?(y/n) y
+How many would you like? 10
+**************************************************
+There are not this many available. The maximum amount that can be ordered is 8
+**************************************************
+Would you like to order the maximum available?(y/n) n
 
-Every time an employee finishes using the tool, it stops running. Very often they want to perform additional queries, so they have to execute again the tool, type again the name and then do the new operation.
+Thank you for your visit, Ruth!
+Item not found.
 
-They want you to add an option that, every time an operation finishes, lets them go back to the menu and chose another operation without stopping the tool.
+What is your user name? Leia
 
-So, whenever the script finishes running any operation (except quit), the script should ask the user if they want to perform another operation. If they decline, then the script should stop running. If they accept, then the initial menu should show up again and ask to pick a choice (without asking again for the user name).
+Hello, Leia!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 2
 
-This should happen indefinitely until the user declines performing a new operation.
+What is the name of the item? Bigger headphones
+Amount available: 0
+Location: Not in stock
 
-Once this is working, there is an additional requirement for this feature. At the end of the session (when the user declines performing another operation), the tool should print a list of the actions taken during that session and they should appear in the order they were performed.
+Thank you for your visit, Leia!
+Unsupported operation.
 
-Example:
+What is your user name? Sherlock
 
-Thank you for your visit, Example!
-In this session you have:
-        1. Listed 5000 items.
-        2. Searched a Cheap tablet.
-        3. Browsed the category Headphones.
-Hint: Each of the main functions for each one of the 3 operations should return a string with the description of the action taken. You may also need to use recursion for this feature.
+Hello, Sherlock!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: Search
 
-User system
+**************************************************
+Search is not a valid operation.
+**************************************************
 
-The tool has become so popular that the warehouse management has decided to let visitors use it also on the front desk. The problem is, visitors should only be allowed to list, search and browse, and they should not be able to order items straight from the tool. The placing of orders should only be allowed to employees in the personnel list of the data.py file.
+Thank you for your visit, Sherlock!
+Quit.
 
-The tool should still ask the name to everyone. Only when the user wants to place an order, the tool will ask for a valid password and then will try to match the user name and password against the previous list.
+What is your user name? John Doe
 
-Hint: If you have a function that starts the order (after the user answers yes to placing the order) you can apply a decorator that checks for a variable in the global scope indicating whether the user is already validated. The decorator will override the function with a prompt for the password, or will call the function normally if the user is already validated.
+Hello, John Doe!
+What would you like to do?
+1. List items by warehouse
+2. Search an item and place an order
+3. Quit
+Type the number of the operation: 3
 
-If there is no employee with such name and password, it should say so and should allow the user to change the name and type again the password. This should happen indefinitely until the user declines trying again or succeeds authenticating and finishes the order.
 
-This can be done easier within the decorator to keep the code cleaner and make it easier to implement this feature.
-
-Any of the employees, of any level, in the personnel list is allowed to place orders.
-
-The next time the user tries to place an order during the same session, if the user has already authenticated before, it should remember and not ask for the password again.
+Thank you for your visit, John Doe!
